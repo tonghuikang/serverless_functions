@@ -30,7 +30,10 @@ How to let one function call another: https://stackoverflow.com/questions/357547
 Changes made: https://stackoverflow.com/a/35795883 need to add (or replace with) `AWSLambdaRole` and `AWSLambdaBasicExecutionRole` as per https://stackoverflow.com/a/50656623. 
 The regions need to be consistent with your resource, as well.
 
-TODO: Allow the function to be called externally.
+### Characterisitics
+- Organisation of functions. All of the lambda functions that you can access should appear on https://console.aws.amazon.com/lambda/home?your-region-here#/functions. Each function will be assigned certain role, each role will need to be assigned certain policy (as above), and then the functions can call each other.  
+
+TODO: Allow the function to be called externally. Understand what AWS Step Functions does.
 
 ## Azure
 When I wanted to create a nodejs function, I was asked to read these tutorials in this order
@@ -41,8 +44,28 @@ When I wanted to create a nodejs function, I was asked to read these tutorials i
 A working sample of the individually running function is found here:
 https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-azure-function (HTTPS trigger)
 
-TODO: Allow the function to be called by each other, and called externally.
+TODO: Allow the functions to be called by each other, and called externally.
+
+Making http call from function: https://stackoverflow.com/questions/52546638/how-to-make-https-call-from-azure-function
+https://stackoverflow.com/questions/50823783/in-azure-functions-using-javascript-how-to-call-send-request-to-a-endpoint
+
+https://medium.com/@burkeholland/solving-the-azure-functions-challenge-with-javascript-65205b0c4920 - functions does not call each other :/
+
+Authorization level - What is the difference? 
+> Authorization level controls whether the function requires an API key and which key to use; Function uses a function key; Admin uses your master key. The function and master keys are found in the 'keys' management panel on the portal, when your function is selected. For user-based authentication, go to Function App Settings.
+
+### Characterisitics
+- Organisation of functions. Functions are organised by function app, and each function app must be authored in the same language.
+- 
+
 
 ## GCP 
 
 TODO: Later.
+
+### Characterisitics
+- Organisation of functions
+- 
+
+# Conclusion
+To elaborate: The extent of vendor lock-in, and best practices to ensure portability. 
