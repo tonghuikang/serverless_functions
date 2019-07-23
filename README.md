@@ -207,6 +207,92 @@ TODO
 ## GCP
 (Google Cloud Platform) While GCP is noted to be developer-friendly, Google is still inexperienced in securing corporate compliance.
 
+### Getting the first individually working function
+https://cloud.google.com/functions/docs/writing/
+https://github.com/GoogleCloudPlatform/nodejs-docs-samples/tree/master/functions/helloworld
+
+You need to install GCP CLI on your local computer first (i.e. running `gcloud` on your machine should work). Log in to your account as well.
+
+Create a folder and create `index.js` with the following code
+```
+const escapeHtml = require('escape-html');
+
+/**
+ * HTTP Cloud Function.
+ *
+ * @param {Object} req Cloud Function request context.
+ *                     More info: https://expressjs.com/en/api.html#req
+ * @param {Object} res Cloud Function response context.
+ *                     More info: https://expressjs.com/en/api.html#res
+ */
+exports.helloHttp = (req, res) => {
+  res.send(`Hello ${escapeHtml(req.query.name || req.body.name || 'World')}!`);
+};
+```
+
+Run the following functions:
+`gcloud functions deploy helloHttp --runtime nodejs10 --trigger-http`
+
+And soon this should be the reply
+```
+Deploying function (may take a while - up to 2 minutes)...done.
+availableMemoryMb: 256
+entryPoint: helloHttp
+httpsTrigger:
+  url: https://<some-subdomain>.cloudfunctions.net/helloHttp
+labels:
+  deployment-tool: cli-gcloud
+name: projects/...<and so on>
+```
+Calling the URL should run the logic properly:
+https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp
+https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp?name=lee
+This is dope. So easy :)
+
+I don't think you need to create individual folders for individual functions as well.
+```
+A single index.js file at the root of your project that exports one or more functions:
+.
+└── index.js
+```
+
+### Logging
+
+### Installing packages
+```
+An app.js file that exports one or more functions, with a package.json file that contains "main": "app.js":
+.
+├── app.js
+└── package.json
+```
+
+### Calling external API
+
+### Allowing functions to call one another
+
+```
+(For example, the following configurations of source code are valid:) An index.js file that imports code from a foo.js file and then exports one or more functions:
+
+.
+├── index.js
+└── foo.js
+```
+
+### Asynchronous functions
+
+
+
+### Exposing the functions externally
+As you see, https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp?name=some_name is public.
+
+### Code organisation
+
+### Repository synchronisation
+Probably you have 
+
+### Middleware structure implementation
+"Using middleware to handle HTTP requests" - from https://cloud.google.com/functions/docs/concepts/nodejs-8-runtime
+
 TODO: Later.
 
 
