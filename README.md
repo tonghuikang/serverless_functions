@@ -42,8 +42,8 @@ app.post('/api/redis-cache/nextIntentAfterLimit', (req, res, next) => {
   monika.activateNextIntent,
   (req, res) => res.send(req.body))
 ```
-https://expressjs.com/en/guide/using-middleware.html
-
+https://expressjs.com/en/guide/using-middleware.html https://expressjs.com/en/guide/using-middleware.html https://medium.com/@selvaganesh93/how-node-js-middleware-works-d8e02a936113 (these middleware refers to a different thing probably, it refers to the app level. For example take logs whenever any of the endpoint is called.)
+Ok it is in the above format. It is a list of functions, at the start it merely logs, and then it passes through middleware function and at the end the response is sent.
 
 ## AWS
 AWS is the most commonly used cloud provider and is compliant with corporate settings. 
@@ -209,11 +209,12 @@ TODO
 
 ### Getting the first individually working function
 https://cloud.google.com/functions/docs/writing/
+https://cloud.google.com/functions/docs/deploying/filesystem
 https://github.com/GoogleCloudPlatform/nodejs-docs-samples/tree/master/functions/helloworld
 
-You need to install GCP CLI on your local computer first (i.e. running `gcloud` on your machine should work). Log in to your account as well.
+You need to install GCP CLI on your local computer first (i.e. running `gcloud` on your machine should work). Log in to your account as well with `gcloud auth login`.
 
-Create a folder and create `index.js` with the following code
+Create a folder and create `index.js` with the following code:
 ```
 const escapeHtml = require('escape-html');
 
@@ -228,9 +229,13 @@ const escapeHtml = require('escape-html');
 exports.helloHttp = (req, res) => {
   res.send(`Hello ${escapeHtml(req.query.name || req.body.name || 'World')}!`);
 };
+
+exports.helloHttp2 = (req, res) => {
+  res.send(`Halo ${escapeHtml(req.query.name || req.body.name || 'World')}!`);
+};
 ```
 
-Run the following functions:
+Run the following functions. These deploys the function helloHttp from `index.js`.
 `gcloud functions deploy helloHttp --runtime nodejs10 --trigger-http`
 
 And soon this should be the reply
@@ -249,7 +254,8 @@ https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp
 https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp?name=lee
 This is dope. So easy :)
 
-I don't think you need to create individual folders for individual functions as well.
+You can include more than one function in index.js
+`gcloud functions deploy helloHttp2 --runtime nodejs10 --trigger-http`
 ```
 A single index.js file at the root of your project that exports one or more functions:
 .
@@ -257,9 +263,13 @@ A single index.js file at the root of your project that exports one or more func
 ```
 
 ### Logging
+https://cloud.google.com/functions/docs/monitoring/logging 
+You run `gcloud functions logs read FUNCTION_NAME` to print the logs of the function.
 
 ### Installing packages
+https://cloud.google.com/functions/docs/writing/specifying-dependencies-nodejs
 ```
+For example, the following configurations of source code are valid:
 An app.js file that exports one or more functions, with a package.json file that contains "main": "app.js":
 .
 ├── app.js
@@ -269,23 +279,39 @@ An app.js file that exports one or more functions, with a package.json file that
 ### Calling external API
 
 ### Allowing functions to call one another
+In the middleware format, the middleware functions (which take in request and return response in a similar format) serve many endpoint functions. The functions called by the middleware functions also serve other middleware functions. 
 
 ```
-(For example, the following configurations of source code are valid:) An index.js file that imports code from a foo.js file and then exports one or more functions:
+An index.js file that imports code from a foo.js file and then exports one or more functions:
 
 .
 ├── index.js
 └── foo.js
 ```
 
+
 ### Asynchronous functions
+https://cloud.google.com/functions/docs/concepts/nodejs-8-runtime
+```
+const fetch = require('node-fetch');
 
-
+/**
+ * Background Cloud Function demonstrates use of async/await.
+ *
+ * @param {object} data The event payload.
+ */
+exports.helloAsync = async data => {
+  const result = await fetch('https://www.example.com');
+  return result;
+};
+```
 
 ### Exposing the functions externally
 As you see, https://us-central1-ubtech-216703.cloudfunctions.net/helloHttp?name=some_name is public.
 
 ### Code organisation
+Each function needs to be housed in a folder, with either of the above formats. 
+The endpoint of functions under same project and region are under the same subdomain.
 
 ### Repository synchronisation
 Probably you have 
