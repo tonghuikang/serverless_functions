@@ -314,10 +314,17 @@ Each function needs to be housed in a folder, with either of the above formats.
 The endpoint of functions under same project and region are under the same subdomain.
 
 ### Repository synchronisation
-Probably you have 
+Guide is here https://cloud.google.com/functions/docs/deploying/repo
+This is the command that I have ran:
+```gcloud functions deploy dialogflowEngine --source https://source.developers.google.com/projects/ubtech-216703/repos/github_tonghuikang_chatbot-sheets-fulfilment/moveable-aliases/gcloudfunc/paths// --runtime nodejs10 --trigger-http```
+This will be the endpoint: https://us-central1-ubtech-216703.cloudfunctions.net/dialogflowEngine
+The repository needs to be on Google Cloud Source Repository. You can sync the repository with Github. However I think you need to run the command to update the function, unless you implement some CI/CD processes. (For example for k8s, once a commit is pushed, building can begin automatically and will deploy to a container when done. I have yet to try this, however. https://cloud.google.com/cloud-build/)
+(Instead of asking the some client to run some long script to deploy on Kubernetes, we could have asked them to fork my repo, synchronise with Google Cloud Source Repository, and run the one line command. However, usage of Google Repository still require a billing account.)
 
 ### Middleware structure implementation
 "Using middleware to handle HTTP requests" - from https://cloud.google.com/functions/docs/concepts/nodejs-8-runtime
+It seems like GCF serve as the middleware function with its request-response convention. The middleware endpoint code as shown in the first section is a list of middleware functions. In GCF, I am expected to export one function, not a list of functions. 
+It may be possible to define a wrapper (?) that takes codes a list of functions, and the wrapper will carry out the request-response-next structure. It still remains to be seen whether can we fulfilment to chained-request-and-break-when-response style (explaination needed).
 
 TODO: Later.
 
