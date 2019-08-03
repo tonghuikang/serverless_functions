@@ -27,23 +27,30 @@ For each platform, I will briefly describe its merits. Then I will explore how t
 - **Logging**. We need logging to ensure our function is working as intended during the development stage. During production, we might want to trace requests and errors.
 - **Installing packages**. (Who doesn't use packages?) Installation may not be straightforward. We also need to know, and if possible change, of the package installed, and where is it noted.
 - **Calling external API**. The function may need to communicate with external API - for example, to put information on Google Sheets. With such an extent of restrictions, we cannot assume that this is a given.
-- **Allowing functions to call one another**.
-- **Asynchronous functions**. JavaScript "is single threaded and has a synchronous execution model. Single threaded means that one command is being executed at a time. Synchronous means one at a time i.e. one line of code is being executed at a time in order the code appears." This issue happens when you need to get a response from a POST request for the next command. In typical implementation (I think this example can be improved) like ```axios = require('axios'); var result = axios.post('/user', {firstName: 'Fred',lastName: 'Flintstone'} console.log(result);``` will return undefined, because the logging function does not wait for the response. One remedy is to use callback, but that adds complexity to the code due to nesting. Another way is to use the `await` keyword does this which forces the command (?) to be completed before proceeding to the next line. The change here that `await` could only be used inside an `async` function. 
+- **Allowing functions to call one another**. It is important to modularise your code for readability and reuseablility. 
+- **Asynchronous functions**. JavaScript "is single threaded and has a synchronous execution model. Single threaded means that one command is being executed at a time. Synchronous means one at a time i.e. one line of code is being executed at a time in order the code appears."
+This issue happens when you need to get a response from a POST request for the next command. 
+In typical implementation (I think this example can be improved) like ```axios = require('axios'); var result = axios.post('/user', {firstName: 'Fred',lastName: 'Flintstone'} console.log(result);``` will return undefined, because the logging function does not wait for the response. 
+One remedy is to use callback, but that adds complexity to the code due to nesting. Another way is to use the `await` keyword which forces the command (?) to be completed before proceeding to the next line. The change here that `await` could only be used inside an `async` function. 
 - **Exposing the functions externally**. In an internship project, these functions are to serve chatbots. The chatbots need to call these functions. One way is to expose these functions through a public URL. Special bindings may be used depending on your specific cloud provider, like in my case the bot-core is hosted on Azure.
 - **Code organisation**. The structure of your code is dictated by your cloud provider with such stringent requirements. We nevertheless want to understand code structure so we can more efficiently convert a typical nodejs app into cloud functions. Moreover, each function may have different levels of privileges and exposure, and this needs to be documented, as well. 
 - **Repository synchronisation**. For sustainable code development, we need to be able to synchronise with a repository, which allows easy access for the developer to understand when the code is edited. 
 - **Middleware structure implementation**. Non-technical people require specific instructions to deploy code with custom fulfillment format. They need to read and edit easy code structure at the which looks like this:
 ```
 // handles conditional response with redis
-app.post('/api/redis-cache/nextIntentAfterLimit', (req, res, next) => {
-  console.log('/api/redis-cache/nextIntentAfterLimit is called...'); next()},
+app.post('/api/redis-cache/nextIntentAfterLimit', 
+  (req, res, next) => {console.log('/api/redis-cache/nextIntentAfterLimit is called...'); next()},
   monika.checkTokenToLimit,
   monika.buildResponseMessages,
   monika.activateNextIntent,
   (req, res) => res.send(req.body))
 ```
-https://expressjs.com/en/guide/using-middleware.html https://expressjs.com/en/guide/using-middleware.html https://medium.com/@selvaganesh93/how-node-js-middleware-works-d8e02a936113 (these middleware refers to a different thing probably, it refers to the app level. For example take logs whenever any of the endpoint is called.)
-Ok it is in the above format. It is a list of functions, at the start it merely logs, and then it passes through middleware function and at the end the response is sent.
+It is a list of functions, at the start it merely logs, and then it passes through middleware functions and at the end the response is sent. 
+https://hackernoon.com/middleware-the-core-of-node-js-apps-ab01fee39200 (most useful)
+https://stackoverflow.com/questions/7337572/what-does-middleware-and-app-use-actually-mean-in-expressjs
+https://expressjs.com/en/guide/using-middleware.html 
+https://expressjs.com/en/guide/using-middleware.html 
+https://medium.com/@selvaganesh93/how-node-js-middleware-works-d8e02a936113
 
 ## AWS
 AWS is the most commonly used cloud provider and is compliant with corporate settings. 
@@ -283,12 +290,12 @@ In the middleware format, the middleware functions (which take in request and re
 
 ```
 An index.js file that imports code from a foo.js file and then exports one or more functions:
-
 .
 ├── index.js
 └── foo.js
 ```
-
+In https://cloud.google.com/functions/docs/concepts/exec:
+> Every deployed function is isolated from all other functions—even those deployed from the same source file. In particular, they don’t share memory, global variables, file systems, or other state.
 
 ### Asynchronous functions
 https://cloud.google.com/functions/docs/concepts/nodejs-8-runtime
@@ -331,3 +338,7 @@ TODO: Later.
 
 # Conclusion
 To elaborate: The extent of vendor lock-in and best practices to ensure portability. 
+
+Developers and decision makers are concerned the extent of lock-in. It is true that it is more difficult to migrate serverless function from one cloud provider to another, compared to solutions which provide more control (e.g. Docker). 
+
+However, the lock-in happens when you imitately use triggers. For example, Google Cloud offers to trigger a cloud function when an entry is added to the cloud bucket. The migration of the cloud function is now less possible, you need to migrate the bucket and modify the function to work equivalently on AWS for example, or write a server that process this process which is troublesome.
