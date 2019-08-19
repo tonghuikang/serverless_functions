@@ -1,3 +1,0 @@
-## Azure Functions
-
-test file
